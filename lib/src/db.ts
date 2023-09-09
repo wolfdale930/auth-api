@@ -1,14 +1,19 @@
 import { Sequelize } from "sequelize";
+import { Config } from "./config";
 
 export class DB {
     static instance: Sequelize;
 
     static connect() {
-        DB.instance = new Sequelize('LinkerDB', 'areeb', 'areeb@1234', {
-            host: '192.168.1.110',
-            dialect: 'mssql',
-            port: 1433
-        });
+        DB.instance = new Sequelize(
+            Config.Database.database,
+            Config.Database.username,
+            Config.Database.password,
+            {
+                host: Config.Database.host,
+                dialect: 'mssql',
+                port: Config.Database.port
+            });
     }
 
 }
