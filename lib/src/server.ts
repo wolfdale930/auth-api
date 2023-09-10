@@ -1,6 +1,7 @@
-import express, { Express } from "express";
-import { DB } from "./db"
+import express from "express";
 import { Config } from "./config";
+import { DB } from "./db";
+import { setupAssociations, syncModels } from "./db-operations";
 
 export class Server {
     async init() {
@@ -15,11 +16,13 @@ export class Server {
 
     async checkLinkerDB(): Promise<boolean> {
         try {
-            DB.connect();
-            await DB.instance.authenticate();
+            await DB.authenticate();
+            setupAssociations();
+            syncModels();
             return true;
         }
         catch (err) {
+            console.log(err);
             return false;
         }
     }
