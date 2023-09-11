@@ -12,4 +12,5 @@ export class Config {
     };
 
     static ApplicationPort = process.env.APP_PORT && !isNaN(parseInt(process.env.APP_PORT)) ? parseInt(process.env.APP_PORT) : 8080;
+    static JwtSecret = process.env.JWT_SECRET || 'local-secret';
 }
