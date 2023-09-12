@@ -4,7 +4,7 @@ import { DB } from "../db";
 
 
 interface AccountAttributes extends Model<InferAttributes<AccountAttributes>, InferCreationAttributes<AccountAttributes>> {
-    id: number;
+    id?: number;
     status: AccountStatus;
 }
 

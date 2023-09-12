@@ -4,12 +4,17 @@ import { DB } from "./db";
 import { setupAssociations, syncModels } from "./db-operations";
 import routes from "./routes";
 import { ApiMethod } from "./enums/api-method.enum";
+import * as bodyParser from 'body-parser';
 
 export class Server {
     async init() {
         if (!await this.checkLinkerDB())
             throw new Error('Unable to connect to LinkerDB');
         const server = express();
+        server.use(bodyParser.urlencoded({
+            extended: true
+        }));
+        server.use(bodyParser.json({ type: 'application/json' }));
         server.listen(Config.ApplicationPort, () => {
             console.log(`Server started on port: ${Config.ApplicationPort}`);
         });

@@ -4,11 +4,13 @@ import { LoginType } from "../enums/login-type.enum";
 import { UserStatus } from "../enums/user-status.enum";
 
 interface UserAttributes extends Model<InferAttributes<UserAttributes>, InferCreationAttributes<UserAttributes>> {
-    id: number;
+    id?: number;
     accountId: number;
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
+    salt: string
     loginType: LoginType;
     status: UserStatus;
 }
@@ -33,6 +35,14 @@ const User = DB.define<UserAttributes>('User', {
         allowNull: false
     },
     email: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    salt: {
         type: DataTypes.STRING,
         allowNull: false
     },
