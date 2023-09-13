@@ -2,6 +2,7 @@ import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequ
 import { DB } from "../db";
 
 interface UserLoginAttributes extends Model<InferAttributes<UserLoginAttributes>, InferCreationAttributes<UserLoginAttributes>> {
+    id: number,
     userId: number;
     otp: number;
     token: string;
@@ -11,8 +12,13 @@ interface UserLoginAttributes extends Model<InferAttributes<UserLoginAttributes>
 
 
 const UserLogin = DB.define<UserLoginAttributes>('UserLogin', {
+    id: {
+        type: DataTypes.BIGINT,
+        primaryKey: true,
+        autoIncrement: true
+    },
     userId: {
-        type: DataTypes.BIGINT.UNSIGNED,
+        type: DataTypes.BIGINT,
         allowNull: false
     },
     otp: {

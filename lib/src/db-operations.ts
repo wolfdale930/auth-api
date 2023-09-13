@@ -20,7 +20,7 @@ export function setupAssociations() {
 }
 
 export function syncModels() {
-    Account.sync();
-    User.sync();
-    UserLogin.sync();
+    Account.sync({ alter: true });
+    User.sync({ alter: true });
+    UserLogin.sync({ alter: true });
 }

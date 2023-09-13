@@ -18,12 +18,12 @@ interface UserAttributes extends Model<InferAttributes<UserAttributes>, InferCre
 
 const User = DB.define<UserAttributes>('User', {
     id: {
-        type: DataTypes.BIGINT.UNSIGNED,
+        type: DataTypes.BIGINT,
         autoIncrement: true,
         primaryKey: true
     },
     accountId: {
-        type: DataTypes.BIGINT.UNSIGNED,
+        type: DataTypes.BIGINT,
         allowNull: false
     },
     firstName: {
