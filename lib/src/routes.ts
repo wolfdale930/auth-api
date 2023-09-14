@@ -21,7 +21,7 @@ const authRoutes = [
     {
         method: ApiMethod.POST,
         path: '/login',
-        controller: AuthController.register,
+        controller: AuthController.login,
         isAuth: false
     }
 ];

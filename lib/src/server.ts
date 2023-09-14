@@ -1,10 +1,9 @@
 import express, { Express } from "express";
 import { Config } from "./config";
-import { DB } from "./db";
-import { setupAssociations, syncModels } from "./db-operations";
 import routes from "./routes";
 import { ApiMethod } from "./enums/api-method.enum";
 import * as bodyParser from 'body-parser';
+import DB from "./db";
 
 export class Server {
     async init() {
@@ -24,9 +23,7 @@ export class Server {
 
     async checkLinkerDB(): Promise<boolean> {
         try {
-            await DB.authenticate();
-            setupAssociations();
-            syncModels();
+            DB.$connect();
             return true;
         }
         catch (err) {
