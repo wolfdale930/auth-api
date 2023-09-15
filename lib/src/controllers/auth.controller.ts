@@ -11,7 +11,7 @@ export class AuthController {
 
     static async login(request: Request, response: Response) {
         const body: RegisterRequest = request.body;
-        response.send(await AuthService.loginUser(body));
+        response.send(await AuthService.loginUser(body, request));
     }
 
 }

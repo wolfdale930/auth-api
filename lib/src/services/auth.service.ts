@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { Config } from "../config";
 import DB from "../db";
 import { AccountStatus } from "../enums/account-status.enum";
@@ -47,7 +48,7 @@ export class AuthService {
         }
     }
 
-    static async loginUser(user: LoginRequest): Promise<Response<any>> {
+    static async loginUser(user: LoginRequest, req: Request): Promise<Response<any>> {
         const exist = await DB.user.findFirst({ where: { email: user.email } });
         if (!exist)
             return { status: 400, message: 'User not exists' };
@@ -58,15 +59,21 @@ export class AuthService {
         const token = jwt.sign({ foo: 'bar' }, Config.JwtSecret);
         let tokenValidity = new Date();
         tokenValidity = new Date(tokenValidity.setHours(tokenValidity.getHours() + 24));
-        const newLogin = await DB.userLogin.create({
-            data: {
-                userId: exist.id,
-                otp: 0,
-                token: token,
-                validity: tokenValidity,
-                lastLoginIp: ''
-            }
-        });
+        try {
+            await DB.userLogin.create({
+                data: {
+                    userId: exist.id,
+                    otp: 0,
+                    token: token,
+                    validity: tokenValidity,
+                    lastLoginIp: req.header('x-forwarded-for') || req.socket.remoteAddress || ''
+                }
+            });
+        }
+        catch (exception) {
+            console.log(`Exception while creating user login: `, user, exception);
+            return { status: 500, message: Messages.INTERNAL_SERVER_ERROR };
+        }
         const res = exist as any;
         delete res.password;
         delete res.salt;
