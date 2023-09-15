@@ -1,4 +1,5 @@
 export enum UserStatus {
     DISABLED,
-    ACTIVE
+    ACTIVE,
+    PENDING_CONFIRMATION
 }

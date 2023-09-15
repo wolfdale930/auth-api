@@ -10,6 +10,7 @@ import { Response } from "../interfaces/response.interface";
 import { Messages } from "../utilities/common";
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import nodemailer from 'nodemailer';
 
 export class AuthService {
 
@@ -34,7 +35,7 @@ export class AuthService {
                     password: hashPassword,
                     salt: salt,
                     loginType: LoginType.EMAIL,
-                    status: UserStatus.ACTIVE
+                    status: UserStatus.PENDING_CONFIRMATION
                 }
             });
             const res = newUser as any;
