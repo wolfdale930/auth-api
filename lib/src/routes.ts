@@ -6,7 +6,7 @@ const statusRoutes = [
     {
         method: ApiMethod.GET,
         path: '/healthy',
-        controller: (req: Request, res: Response) => { res.send('API is working'); },
+        controller: (_req: Request, res: Response) => { res.send('API is working'); },
         isAuth: false
     },
 ];

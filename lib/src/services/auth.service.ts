@@ -55,7 +55,18 @@ export class AuthService {
         if (!bcrypt.compareSync(user.password, exist.password))
             return { status: 400, message: 'Invalid credentials' };
 
-        const token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+        const token = jwt.sign({ foo: 'bar' }, Config.JwtSecret);
+        let tokenValidity = new Date();
+        tokenValidity = new Date(tokenValidity.setHours(tokenValidity.getHours() + 24));
+        const newLogin = await DB.userLogin.create({
+            data: {
+                userId: exist.id,
+                otp: 0,
+                token: token,
+                validity: tokenValidity,
+                lastLoginIp: ''
+            }
+        });
         const res = exist as any;
         delete res.password;
         delete res.salt;
