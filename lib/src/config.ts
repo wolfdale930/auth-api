@@ -14,4 +14,11 @@ export class Config {
     static ApplicationPort = process.env.APP_PORT && !isNaN(parseInt(process.env.APP_PORT)) ? parseInt(process.env.APP_PORT) : 8080;
     static JwtSecret = process.env.JWT_SECRET || 'local-secret';
     static BcryptSaltRounds = process.env.BCRYPT_SALT_ROUNDS && !isNaN(parseInt(process.env.BCRYPT_SALT_ROUNDS)) ? parseInt(process.env.BCRYPT_SALT_ROUNDS) : 10;
+    static Mailer = {
+        emailId: process.env.MAILER_USER || 'email@domain.com',
+        password: process.env.MAILER_PASSWORD || 'password',
+        clientId: process.env.MAILER_CLIENT_ID || 'clientId',
+        clientSecret: process.env.MAILER_CLIENT_SECRET || 'clientSecret',
+        refreshToken: process.env.MAILER_GMAIL_REFRESH_TOKEN || 'refreshToken'
+    }
 }

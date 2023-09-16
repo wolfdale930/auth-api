@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "migrate": "npm run build & sequelize-cli db:migrate",
+    "build": "tsc && npm run copyAssets",
+    "copyAssets": "node -e \"require('fs').cpSync('./templates', './dist/templates', {recursive: true});\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
