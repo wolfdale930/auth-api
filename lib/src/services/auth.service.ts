@@ -12,10 +12,11 @@ import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import { EmailService } from "./email.service";
 import { EmailType } from "../enums/email-types.enum";
+import { rejects } from "assert";
 
 export class AuthService {
 
-    static async registerUser(user: RegisterRequest): Promise<Response<any>> {
+    static async registerUser(user: RegisterRequest, req: Request): Promise<Response<any>> {
         const exist = await DB.user.findFirst({ where: { email: user.email } });
         if (exist)
             return { status: 400, message: 'User already exists' };
@@ -39,10 +40,12 @@ export class AuthService {
                     status: UserStatus.PENDING_CONFIRMATION
                 }
             });
-            EmailService.sendEmail(newUser.email, EmailType.CONFIRMATION);
             const res = newUser as any;
             delete res.password;
             delete res.salt;
+
+            AuthService.silentLoginUserAndSendEmail(res, req);
+
             return { status: 200, data: res };
         }
         catch (exception) {
@@ -82,6 +85,26 @@ export class AuthService {
         delete res.salt;
         res['token'] = token;
         return { status: 200, data: res };
+    }
+
+    private static async silentLoginUserAndSendEmail(data: any, req: Request) {
+        return new Promise((resolve, reject) => {
+            let tokenValidity = new Date();
+            tokenValidity = new Date(tokenValidity.setHours(tokenValidity.getMinutes() + 15));
+            const token = jwt.sign(data, Config.JwtSecret, { expiresIn: tokenValidity.getTime() });
+            DB.userLogin.create({
+                data: {
+                    userId: data.id,
+                    otp: 0,
+                    token: token,
+                    validity: tokenValidity,
+                    lastLoginIp: req.header('x-forwarded-for') || req.socket.remoteAddress || ''
+                }
+            }).catch((exception) => {
+                console.log(`Exception while creating user login: `, data, exception);
+            });
+            EmailService.sendEmail(data.email, EmailType.CONFIRMATION, { 'CONFIRMATION_LINK': `${Config.ApplicationUrl}:${Config.ApplicationPort}/confirmation?token=${encodeURIComponent(token)}` });
+        });
     }
 
 }

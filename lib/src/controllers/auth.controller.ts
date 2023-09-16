@@ -6,7 +6,7 @@ export class AuthController {
 
     static async register(request: Request, response: Response) {
         const body: RegisterRequest = request.body;
-        response.send(await AuthService.registerUser(body));
+        response.send(await AuthService.registerUser(body, request));
     }
 
     static async login(request: Request, response: Response) {

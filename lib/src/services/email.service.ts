@@ -28,12 +28,16 @@ export class EmailService {
         });
     }
 
-    static sendEmail(email: string, emailType: EmailType) {
+    static sendEmail(email: string, emailType: EmailType, fields: any) {
         return new Promise((resolve, reject) => {
-            const template = EmailService.templates[emailType.toString()];
+            let template = EmailService.templates[emailType.toString()] as string;
             if (!template) {
                 console.log(`Template not found: ${emailType.toString()}`);
                 return;
+            }
+
+            for (const key in fields) {
+                template = template.replace(`{{ ${key} }}`, fields[key]);
             }
 
             const mailData = {
