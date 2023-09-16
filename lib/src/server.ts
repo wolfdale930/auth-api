@@ -4,11 +4,14 @@ import routes from "./routes";
 import { ApiMethod } from "./enums/api-method.enum";
 import * as bodyParser from 'body-parser';
 import DB from "./db";
+import { EmailService } from "./services/email.service";
 
 export class Server {
     async init() {
         if (!await this.checkLinkerDB())
             throw new Error('Unable to connect to LinkerDB');
+        if (!this.startEmailService())
+            throw new Error('Unable to start Email Service');
         const server = express();
         server.use(bodyParser.urlencoded({
             extended: true
@@ -28,6 +31,16 @@ export class Server {
         }
         catch (err) {
             console.log(err);
+            return false;
+        }
+    }
+
+    startEmailService() {
+        try {
+            EmailService.init();
+            return true;
+        } catch (error) {
+            console.log(error);
             return false;
         }
     }

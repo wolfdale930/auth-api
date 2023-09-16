@@ -10,8 +10,8 @@ import { Response } from "../interfaces/response.interface";
 import { Messages } from "../utilities/common";
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
-import fs from 'fs';
-const nodemailer = require('nodemailer');
+import { EmailService } from "./email.service";
+import { EmailType } from "../enums/email-types.enum";
 
 export class AuthService {
 
@@ -39,29 +39,7 @@ export class AuthService {
                     status: UserStatus.PENDING_CONFIRMATION
                 }
             });
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    type: 'OAuth2',
-                    user: Config.Mailer.emailId,
-                    pass: Config.Mailer.password,
-                    clientId: Config.Mailer.clientId,
-                    clientSecret: Config.Mailer.clientSecret,
-                    refreshToken: Config.Mailer.refreshToken
-                }
-            });
-            var content = fs.readFileSync("templates/confirmation.html", "utf-8");
-            const mailData = {
-                from: 'areeb.abhipra@gmail.com',
-                to: newUser.email,
-                subject: 'User Confirmation',
-                html: content
-            };
-            transporter.sendMail(mailData, function (error: any, info: any) {
-                if (error) console.log(error);
-                console.log('Email Sent Successfully');
-                console.log(info);
-            });
+            EmailService.sendEmail(newUser.email, EmailType.CONFIRMATION);
             const res = newUser as any;
             delete res.password;
             delete res.salt;
