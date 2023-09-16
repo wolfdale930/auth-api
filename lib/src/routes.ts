@@ -23,6 +23,12 @@ const authRoutes = [
         path: '/login',
         controller: AuthController.login,
         isAuth: false
+    },
+    {
+        method: ApiMethod.GET,
+        path: '/confirmation',
+        controller: AuthController.confirmation,
+        isAuth: false
     }
 ];
 

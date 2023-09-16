@@ -13,6 +13,7 @@ import jwt from 'jsonwebtoken'
 import { EmailService } from "./email.service";
 import { EmailType } from "../enums/email-types.enum";
 import { rejects } from "assert";
+import { User } from "@prisma/client";
 
 export class AuthService {
 
@@ -85,6 +86,51 @@ export class AuthService {
         delete res.salt;
         res['token'] = token;
         return { status: 200, data: res };
+    }
+
+    static async confirmUser(token: string, req: Request): Promise<Response<any>> {
+        try {
+            const payload = jwt.verify(token, Config.JwtSecret) as any;
+            if (!payload || typeof (payload) == 'string')
+                return { status: 400, message: 'Invalid token' };
+
+            const userId = payload.id;
+            const user = await DB.user.findFirst({ where: { id: userId } });
+            if (!user)
+                return { status: 400, message: 'User does not exists' };
+            const userLogin = DB.userLogin.findFirst({ where: { userId: user.id, token: token } });
+            if (!userLogin)
+                return { status: 400, message: 'Login does not exists' };
+
+            const res = user as any;
+            delete res.password;
+            delete res.salt;
+            let tokenValidity = new Date();
+            tokenValidity = new Date(tokenValidity.setHours(tokenValidity.getHours() + 24));
+            const newToken = jwt.sign(res, Config.JwtSecret, { expiresIn: tokenValidity.getTime() });
+
+            try {
+                await DB.user.update({ where: { id: user.id }, data: { status: UserStatus.ACTIVE } });
+                await DB.userLogin.create({
+                    data: {
+                        userId: user.id,
+                        otp: 0,
+                        token: newToken,
+                        validity: tokenValidity,
+                        lastLoginIp: req.header('x-forwarded-for') || req.socket.remoteAddress || ''
+                    }
+                });
+            }
+            catch (exception) {
+                console.log(`Exception while updating user status or creating user login: `, user, exception);
+                return { status: 500, message: Messages.INTERNAL_SERVER_ERROR };
+            }
+            res['token'] = newToken;
+            return { status: 200, data: res };
+
+        } catch (error) {
+            return { status: 400, message: 'Invalid token' };
+        }
     }
 
     private static async silentLoginUserAndSendEmail(data: any, req: Request) {

@@ -14,4 +14,9 @@ export class AuthController {
         response.send(await AuthService.loginUser(body, request));
     }
 
+    static async confirmation(request: Request, response: Response) {
+        const token = request.query?.token as string;
+        response.send(await AuthService.confirmUser(token, request));
+    }
+
 }
