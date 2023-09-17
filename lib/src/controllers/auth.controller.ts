@@ -19,4 +19,9 @@ export class AuthController {
         response.send(await AuthService.confirmUser(token, request));
     }
 
+    static async resendConfirmation(request: Request, response: Response) {
+        const body: RegisterRequest = request.body;
+        response.send(await AuthService.resendEmailConfirmation(body, request));
+    }
+
 }

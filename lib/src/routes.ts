@@ -29,6 +29,12 @@ const authRoutes = [
         path: '/confirmation',
         controller: AuthController.confirmation,
         isAuth: false
+    },
+    {
+        method: ApiMethod.POST,
+        path: '/resend-confirmation',
+        controller: AuthController.confirmation,
+        isAuth: false
     }
 ];
 

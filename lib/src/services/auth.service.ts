@@ -12,8 +12,6 @@ import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import { EmailService } from "./email.service";
 import { EmailType } from "../enums/email-types.enum";
-import { rejects } from "assert";
-import { User } from "@prisma/client";
 
 export class AuthService {
 
@@ -131,6 +129,27 @@ export class AuthService {
         } catch (error) {
             return { status: 400, message: 'Invalid token' };
         }
+    }
+
+    static async resendEmailConfirmation(login: LoginRequest, req: Request): Promise<Response<any>> {
+        const exist = await DB.user.findFirst({ where: { email: login.email } });
+        if (!exist)
+            return { status: 400, message: 'User not exists' };
+
+        if (!bcrypt.compareSync(login.password, exist.password))
+            return { status: 400, message: 'Invalid credentials' };
+
+        if (exist.status != UserStatus.PENDING_CONFIRMATION)
+            return { status: 400, message: 'User does not need email confirmation' };
+
+        const res = exist as any;
+        delete res.password;
+        delete res.salt;
+
+        DB.userLogin.deleteMany({ where: { userId: exist.id } }).then(() => {
+            this.silentLoginUserAndSendEmail(res, req);
+        });
+        return { status: 200, message: 'Email sent' };
     }
 
     private static async silentLoginUserAndSendEmail(data: any, req: Request) {
